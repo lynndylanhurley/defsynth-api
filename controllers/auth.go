@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -68,14 +67,17 @@ func AuthCallback(r render.Render, params martini.Params, req *http.Request, db 
 		panic(err)
 	}
 
-	json_bytes, err := json.Marshal(user_info.Data())
+	json_str, err := user_info.Data().JSON()
 
 	if err != nil {
-		fmt.Printf("@-->json serialize err %v", err)
+		fmt.Printf("@-->json string err %v", err)
 		panic(err)
 	}
 
-	user.UserInfo = json_bytes
+	fmt.Printf("@-->user %v", user)
+
+	user.Email = user_info.Email()
+	user.UserInfo = json_str
 	user.AuthToken = signature.RandomKey(64)
 
 	if db.Save(&user).Error != nil {

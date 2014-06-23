@@ -84,6 +84,12 @@ func main() {
 		r.Get("/:provider/callback", controllers.AuthCallback)
 	})
 
+	m.Group("/users", func(r martini.Router) {
+		r.Get("", controllers.GetUsers)
+		r.Get("/:id", controllers.GetUser)
+		r.Delete("/:id", controllers.DeleteUser)
+	})
+
 	// start server
 	log.Fatal(http.ListenAndServe(":3001", m))
 }
