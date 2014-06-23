@@ -10,6 +10,9 @@ import (
 	"github.com/martini-contrib/binding"
 	"github.com/martini-contrib/cors"
 	"github.com/martini-contrib/render"
+	"github.com/stretchr/gomniauth"
+	"github.com/stretchr/gomniauth/providers/github"
+	"github.com/stretchr/signature"
 
 	_ "github.com/lib/pq"
 	"github.com/lynndylanhurley/defsynth-api/controllers"
@@ -33,6 +36,17 @@ func main() {
 	db.AutoMigrate(models.Component{})
 	db.AutoMigrate(models.ModuleComponent{})
 	db.AutoMigrate(models.SynthModule{})
+	db.AutoMigrate(models.User{})
+
+	// init oauth
+	gomniauth.SetSecurityKey(signature.RandomKey(64))
+	gomniauth.WithProviders(
+		github.New(
+			"bffafe2fd4db7beb5d42",
+			"60d9528dbc1cf06374968a92be749db25c50899b",
+			"http://defsynth-api.dev/auth/github/callback",
+		),
+	)
 
 	// init server
 	m = martini.Classic()
@@ -63,6 +77,11 @@ func main() {
 		r.Post("", binding.Bind(models.SynthModule{}), controllers.PostSynthModule)
 		r.Delete("/:id", binding.Bind(models.SynthModule{}), controllers.DeleteSynthModule)
 		r.Put("/:id", binding.Bind(models.SynthModule{}), controllers.UpdateSynthModule)
+	})
+
+	m.Group("/auth", func(r martini.Router) {
+		r.Get("/:provider/login", controllers.AuthLogin)
+		r.Get("/:provider/callback", controllers.AuthCallback)
 	})
 
 	// start server
