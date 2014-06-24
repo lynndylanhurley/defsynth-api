@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/go-martini/martini"
 	"github.com/jinzhu/gorm"
+	"github.com/joho/godotenv"
 	"github.com/martini-contrib/binding"
 	"github.com/martini-contrib/cors"
 	"github.com/martini-contrib/render"
@@ -40,23 +42,32 @@ func main() {
 	db.AutoMigrate(models.SynthModule{})
 	db.AutoMigrate(models.User{})
 
+	// read keys from env
+	envName := martini.Env
+	envFileName := strings.Join([]string{".env.", envName}, "")
+	envMap, err := godotenv.Read(envFileName)
+
+	if err != nil {
+		panic(fmt.Sprintf("env load error: %v", err))
+	}
+
 	// init oauth
 	gomniauth.SetSecurityKey(signature.RandomKey(64))
 	gomniauth.WithProviders(
 		github.New(
-			"bffafe2fd4db7beb5d42",
-			"60d9528dbc1cf06374968a92be749db25c50899b",
-			"http://defsynth-api.dev/auth/github/callback",
+			envMap["AUTH_GITHUB_KEY"],
+			envMap["AUTH_GITHUB_SECRET"],
+			envMap["AUTH_GITHUB_CALLBACK"],
 		),
 		facebook.New(
-			"1438108269792333",
-			"7997a0a6c69347c37ebe86d4d0a9c2a2",
-			"http://defsynth-api.dev/auth/facebook/callback",
+			envMap["AUTH_FACEBOOK_KEY"],
+			envMap["AUTH_FACEBOOK_SECRET"],
+			envMap["AUTH_FACEBOOK_CALLBACK"],
 		),
 		google.New(
-			"12391945739-rc7d7ct5snnulj9n35kjoui6ggf9vuhe.apps.googleusercontent.com",
-			"cbTsDXsyS2GmyBZZfZA6M9E4",
-			"http://defsynth-api.192.168.1.102.xip.io/auth/google/callback",
+			envMap["AUTH_GOOGLE_KEY"],
+			envMap["AUTH_GOOGLE_SECRET"],
+			envMap["AUTH_GOOGLE_CALLBACK"],
 		),
 	)
 
