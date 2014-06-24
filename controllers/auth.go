@@ -62,22 +62,14 @@ func AuthCallback(r render.Render, params martini.Params, req *http.Request, db 
 
 	user := models.User{}
 
-	if db.Where(models.User{Email: user_info.Email()}).FirstOrCreate(&user).Error != nil {
-		fmt.Printf("@-->find err %v", err)
-		panic(err)
-	}
+	db.Where(models.User{Email: user_info.Email()}).FirstOrCreate(&user)
 
-	json_str, err := user_info.Data().JSON()
-
-	if err != nil {
-		fmt.Printf("@-->json string err %v", err)
-		panic(err)
-	}
-
-	fmt.Printf("@-->user %v", user)
+	fmt.Printf("@-->user info %+v", user_info)
 
 	user.Email = user_info.Email()
-	user.UserInfo = json_str
+	user.Name = user_info.Name()
+	user.AvatarURL = user_info.AvatarURL()
+	user.Nickname = user_info.Nickname()
 	user.AuthToken = signature.RandomKey(64)
 
 	if db.Save(&user).Error != nil {
@@ -88,6 +80,8 @@ func AuthCallback(r render.Render, params martini.Params, req *http.Request, db 
 	r.HTML(200, "auth_callback", map[string]interface{}{
 		"email":      user.Email,
 		"auth_token": user.AuthToken,
-		"user_info":  user_info.Data(),
+		"name":       user.Name,
+		"nickname":   user.Nickname,
+		"avatar_url": user.AvatarURL,
 	})
 }

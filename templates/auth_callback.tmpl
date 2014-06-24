@@ -4,12 +4,14 @@
       window.addEventListener("message", function(ev) {
         if (ev.data === "requestCredentials") {
           ev.source.postMessage({
-            message: "deliverCredentials",
-            email: {{ .email }},
+            message:    "deliverCredentials",
+            email:      {{ .email }},
             auth_token: {{ .auth_token }},
-            user_info: {{ .user_info }}
+            avatar_url: {{ .avatar_url }},
+            nickname:   {{ .nickname}},
+            name:       {{ .name }}
           }, '*');
-          //window.close();
+          window.close();
         }
       });
     </script>

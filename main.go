@@ -11,7 +11,9 @@ import (
 	"github.com/martini-contrib/cors"
 	"github.com/martini-contrib/render"
 	"github.com/stretchr/gomniauth"
+	"github.com/stretchr/gomniauth/providers/facebook"
 	"github.com/stretchr/gomniauth/providers/github"
+	"github.com/stretchr/gomniauth/providers/google"
 	"github.com/stretchr/signature"
 
 	_ "github.com/lib/pq"
@@ -45,6 +47,16 @@ func main() {
 			"bffafe2fd4db7beb5d42",
 			"60d9528dbc1cf06374968a92be749db25c50899b",
 			"http://defsynth-api.dev/auth/github/callback",
+		),
+		facebook.New(
+			"1438108269792333",
+			"7997a0a6c69347c37ebe86d4d0a9c2a2",
+			"http://defsynth-api.dev/auth/facebook/callback",
+		),
+		google.New(
+			"12391945739-rc7d7ct5snnulj9n35kjoui6ggf9vuhe.apps.googleusercontent.com",
+			"cbTsDXsyS2GmyBZZfZA6M9E4",
+			"http://defsynth-api.192.168.1.102.xip.io/auth/google/callback",
 		),
 	)
 
