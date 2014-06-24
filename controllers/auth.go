@@ -34,6 +34,16 @@ func AuthLogin(r render.Render, db gorm.DB, params martini.Params, res http.Resp
 	}
 }
 
+func ValidateToken(r render.Render, db gorm.DB, params martini.Params, user models.User) {
+	fmt.Printf("@-->query %+v", user)
+
+	if db.First(&user, &user).RecordNotFound() {
+		r.JSON(401, map[string]interface{}{"error": "unauthorized"})
+	} else {
+		r.JSON(200, map[string]interface{}{"data": &user})
+	}
+}
+
 func AuthCallback(r render.Render, params martini.Params, req *http.Request, db gorm.DB) {
 	provider, err := gomniauth.Provider(params["provider"])
 

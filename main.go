@@ -48,10 +48,10 @@ func main() {
 	envMap, err := godotenv.Read(envFileName)
 
 	if err != nil {
-		panic(fmt.Sprintf("env load error: %v", err))
+		panic(fmt.Sprintf("@-->env vars load error: %v", err))
 	}
 
-	// init oauth
+	// init oauth providers
 	gomniauth.SetSecurityKey(signature.RandomKey(64))
 	gomniauth.WithProviders(
 		github.New(
@@ -105,6 +105,7 @@ func main() {
 	m.Group("/auth", func(r martini.Router) {
 		r.Get("/:provider/login", controllers.AuthLogin)
 		r.Get("/:provider/callback", controllers.AuthCallback)
+		r.Post("/validate_token", binding.Bind(models.User{}), controllers.ValidateToken)
 	})
 
 	m.Group("/users", func(r martini.Router) {
